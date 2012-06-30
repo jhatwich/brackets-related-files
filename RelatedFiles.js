@@ -144,7 +144,7 @@ define(function (require, exports, module) {
                     
             
                     // don't fail-fast, do in background, don't process anything right now
-                    Async.doSequentially(fileListResult, function (fileEval) {
+                    Async.doSequentiallyInBackground(fileListResult, function (fileEval) {
                         var result = new $.Deferred(),
                             uriEval,
                             extensionEval,
@@ -180,7 +180,7 @@ define(function (require, exports, module) {
                         
                         result.resolve();
                         return result.promise();
-                    }, false, true, false)
+                    }, 20, 30)
                         .done(function () {
                             relatedListLoaded[docFile.fullPath] = true;
                             masterPromise.resolve();
