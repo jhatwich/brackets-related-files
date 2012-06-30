@@ -16,5 +16,6 @@ starts being maintained when you first use the extension, so you won't see folde
 installed it).
 
 ! WARNING !
+-----------
 The extension is designed to run in the background, with the current master branch of Brackets it runs
 in a blocking manner.  It works better on large projects with pull request #1009 (Async.doSequentiallyInBackground support).
