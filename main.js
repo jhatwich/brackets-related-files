@@ -85,7 +85,7 @@ define(function (require, exports, module) {
     
     function _bindRelatedFileLink($item, $relatedFiles, $relatedFilesLink, $relatedFile, file) {
         
-        $relatedFile.click(function () {
+        $relatedFile.mousedown(function (e) {
             _toggleRelatedFilesDisplay($item, false);
             
             DocumentManager.getDocumentForPath(file.fullPath)
