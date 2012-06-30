@@ -8,7 +8,7 @@ working set files and can open the related files from there.
 The list of related files is determined by searching a document for relative paths to each of the files in a project.
 A few tweaks are in place so that it can find requires in JavaScript.
 
-Get Started
+Install
 -----------
 Copy (or git clone) this folder into the `brackets/src/extensions/user` folder and restart Brackets.
 Click on the project name in the sidebar to see the list of recently opened folders (the list only
