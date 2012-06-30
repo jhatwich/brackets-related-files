@@ -142,54 +142,106 @@ define(function (require, exports, module) {
                     var docText = doc.getText(),
                         docExtension = _getFileExtension(docFile.fullPath);
                     
-            
-                    // don't fail-fast, do in background, don't process anything right now
-                    Async.doSequentiallyInBackground(fileListResult, function (fileEval) {
-                        var result = new $.Deferred(),
-                            uriEval,
-                            extensionEval,
-                            uriRegEx;
-                        
-                        if (fileEval.fullPath !== docFile.fullPath) {
+                    //TEMPORARY - allow the extension to work if Async.doSequentiallyInBackground isn't there
+                    if (!Async.doSequentiallyInBackground) {
+                        Async.doSequentially(fileListResult, function (fileEval) {
+                            var result = new $.Deferred(),
+                                uriEval,
+                                extensionEval,
+                                uriRegEx;
                             
-                            uriEval = getRelativeURI(ProjectManager.getProjectRoot().fullPath, fileEval.fullPath, docFile.fullPath);
-                
-                            //see if its an allowed file type
-                            extensionEval = _getFileExtension(fileEval.fullPath);
-                            if (FILE_TYPES_ALLOWED[extensionEval]) {
+                            if (fileEval.fullPath !== docFile.fullPath) {
+                                
+                                uriEval = getRelativeURI(ProjectManager.getProjectRoot().fullPath, fileEval.fullPath, docFile.fullPath);
                     
-                                uriRegEx = _createRegEx(uriEval);
-                                if (docText.search(uriRegEx) !== -1) {
-                                    _recordRelationship(docFile, fileEval);
-                                    
-                                } else {
-                                    if (docExtension === ".js") {
-                                        //if our file is a JS then try to find require references that might not have an extension
+                                //see if its an allowed file type
+                                extensionEval = _getFileExtension(fileEval.fullPath);
+                                if (FILE_TYPES_ALLOWED[extensionEval]) {
+                        
+                                    uriRegEx = _createRegEx(uriEval);
+                                    if (docText.search(uriRegEx) !== -1) {
+                                        _recordRelationship(docFile, fileEval);
                                         
-                                        uriEval = fileEval.fullPath.substring(ProjectManager.getProjectRoot().fullPath.length);
-                                        uriEval = "\"" + uriEval.substring(0, uriEval.length - extensionEval.length) + "\"";
-                                        
-                                        uriRegEx = _createRegEx(uriEval);
-                                        if (docText.search(uriRegEx) !== -1) {
-                                            _recordRelationship(docFile, fileEval);
+                                    } else {
+                                        if (docExtension === ".js") {
+                                            //if our file is a JS then try to find require references that might not have an extension
+                                            
+                                            uriEval = fileEval.fullPath.substring(ProjectManager.getProjectRoot().fullPath.length);
+                                            uriEval = "\"" + uriEval.substring(0, uriEval.length - extensionEval.length) + "\"";
+                                            
+                                            uriRegEx = _createRegEx(uriEval);
+                                            if (docText.search(uriRegEx) !== -1) {
+                                                _recordRelationship(docFile, fileEval);
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
+                            
+                            result.resolve();
+                            return result.promise();
+                        }, false)
+                            .done(function () {
+                                relatedListLoaded[docFile.fullPath] = true;
+                                masterPromise.resolve();
+                            })
+                            .fail(function () {
+                                console.log("find related files FAILED!");
+                                relatedListLoaded[docFile.fullPath] = true;
+                                masterPromise.resolve();
+                            });
+                    } else {
+                    
+                        //END TEMPORARY CODE (also remove this else)
                         
-                        result.resolve();
-                        return result.promise();
-                    }, 20, 30)
-                        .done(function () {
-                            relatedListLoaded[docFile.fullPath] = true;
-                            masterPromise.resolve();
-                        })
-                        .fail(function () {
-                            console.log("find related files FAILED!");
-                            relatedListLoaded[docFile.fullPath] = true;
-                            masterPromise.resolve();
-                        });
+                        // do the search in the background
+                        Async.doSequentiallyInBackground(fileListResult, function (fileEval) {
+                            var result = new $.Deferred(),
+                                uriEval,
+                                extensionEval,
+                                uriRegEx;
+                            
+                            if (fileEval.fullPath !== docFile.fullPath) {
+                                
+                                uriEval = getRelativeURI(ProjectManager.getProjectRoot().fullPath, fileEval.fullPath, docFile.fullPath);
+                    
+                                //see if its an allowed file type
+                                extensionEval = _getFileExtension(fileEval.fullPath);
+                                if (FILE_TYPES_ALLOWED[extensionEval]) {
+                        
+                                    uriRegEx = _createRegEx(uriEval);
+                                    if (docText.search(uriRegEx) !== -1) {
+                                        _recordRelationship(docFile, fileEval);
+                                        
+                                    } else {
+                                        if (docExtension === ".js") {
+                                            //if our file is a JS then try to find require references that might not have an extension
+                                            
+                                            uriEval = fileEval.fullPath.substring(ProjectManager.getProjectRoot().fullPath.length);
+                                            uriEval = "\"" + uriEval.substring(0, uriEval.length - extensionEval.length) + "\"";
+                                            
+                                            uriRegEx = _createRegEx(uriEval);
+                                            if (docText.search(uriRegEx) !== -1) {
+                                                _recordRelationship(docFile, fileEval);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            result.resolve();
+                            return result.promise();
+                        }, 20, 30)
+                            .done(function () {
+                                relatedListLoaded[docFile.fullPath] = true;
+                                masterPromise.resolve();
+                            })
+                            .fail(function () {
+                                console.log("find related files FAILED!");
+                                relatedListLoaded[docFile.fullPath] = true;
+                                masterPromise.resolve();
+                            });
+                    }
                 })
                 .fail(function (error) {
                     // Error reading this file. This is most likely because the file isn't a text file.
