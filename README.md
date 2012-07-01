@@ -11,9 +11,8 @@ A few tweaks are in place so that it can find requires in JavaScript.
 Install
 -----------
 Copy (or git clone) this folder into the `brackets/src/extensions/user` folder and restart Brackets.
-Click on the project name in the sidebar to see the list of recently opened folders (the list only
-starts being maintained when you first use the extension, so you won't see folders from before you
-installed it).
+Mouse over a file you've opened in the working set and you will see a discloser to the right of the file.
+Use the discloser to reveal related file and click on one to open it.
 
 ! WARNING !
 -----------
