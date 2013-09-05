@@ -1,0 +1,12 @@
+{
+    "name": "jhatwich.brackets-related-files",
+    "title": "Related Files",
+    "description": "Discovers and allows you to open related files in your project.",
+    "homepage": "https://github.com/jhatwich/brackets-related-files",
+    "version": "0.1.0",
+    "author": "Josh Hatwich",
+    "license": "MIT",
+    "engines": {
+        "brackets": ">=0.28.0"
+    }
+}

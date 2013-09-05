@@ -258,6 +258,12 @@ define(function (require, exports, module) {
         findDocRelatedFiles(fileAdded);
     }
     
+    function _onWorkingSetAddList(event, fileList) {
+        $.each(fileList, function (fileItem) {
+            findDocRelatedFiles(fileItem);
+        });
+    }
+    
     function _onDocumentSaved(event, docSaved) {
         relatedListPromises[docSaved.file.fullPath] = null;
         relatedListLookup[docSaved.file.fullPath] = null;
@@ -275,7 +281,8 @@ define(function (require, exports, module) {
     // Initialize: register listeners
     $(DocumentManager).on("workingSetAdd", _onWorkingSetAdd);
     $(DocumentManager).on("documentSaved", _onDocumentSaved);
-    $(ProjectManager).on("projectRootChanged", _onProjectRootChanged);
+    $(ProjectManager).on("projectOpen", _onProjectRootChanged);
+    $(DocumentManager).on("workingSetAddList", _onWorkingSetAddList);
     
     exports.hasLoaded = hasLoaded;
     exports.getRelatedFiles = getRelatedFiles;
